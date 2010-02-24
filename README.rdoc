@@ -1,6 +1,6 @@
 = mechanize-content
 
-Description goes here.
+pass in a url or urls and mechanize-content will select the best block of text, image and title by analysing the page content
 
 == Note on Patches/Pull Requests
  
