@@ -13,10 +13,23 @@ describe "MechanizeContent" do
   
   it "page has incorrect class so only url returned" do
     mc = MechanizeContent.new("http://techmeme.com/")
-    agent = mock("agent", :null_object => true)
-    page = mock("page", :null_object => true)
+    agent = mock("agent")
+    page = mock("page")
+    page.stub!(:class).and_return(String)
     agent.should_receive(:get).with("http://techmeme.com/").and_return(page)
     mc.should_receive(:init_agent).and_return(agent)
     mc.best_title.should eql("http://techmeme.com/")
   end
+  
+  it "page has no title so only url returned" do
+    mc = MechanizeContent.new("http://techmeme.com/")
+    agent = mock("agent")
+    page = mock("page")
+    page.stub!(:class).and_return(Mechanize::Page)
+    page.stub!(:title).and_return(nil)
+    agent.should_receive(:get).with("http://techmeme.com/").and_return(page)
+    mc.should_receive(:init_agent).and_return(agent)
+    mc.best_title.should eql("http://techmeme.com/")
+  end
+  
 end
