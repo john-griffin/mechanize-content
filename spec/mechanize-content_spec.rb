@@ -32,4 +32,28 @@ describe "MechanizeContent" do
     mc.best_title.should eql("http://techmeme.com/")
   end
   
+  it "page retrival errors" do
+    mc = MechanizeContent.new("http://techmeme.com/")
+    agent = mock("agent")
+    page = mock("page")
+    page.stub!(:class).and_return(Mechanize::Page)
+    agent.should_receive(:get).with("http://techmeme.com/").and_raise(Timeout::Error)
+    agent.should_receive(:get).with("http://somewherelse.com/").and_raise(Errno::ECONNRESET)
+    mc.should_receive(:init_agent).any_number_of_times.and_return(agent)
+    
+    mc.fetch_page("http://techmeme.com/").should eql(nil)
+    mc.fetch_page("http://somewherelse.com/").should eql(nil)
+  end  
+  
+  it "mechanize page issues" do
+    mc = MechanizeContent.new("http://techmeme.com/")
+    agent = mock("agent")
+    page = mock("page")
+    mc.stub!(:init_agent).and_return(agent)
+    page.stub!(:code).and_return(400)
+    agent.should_receive(:get).with("http://techmeme.com/").and_return(page)
+    mc.fetch_page("http://techmeme.com/").should eql(nil)
+  end
+  
+  
 end
