@@ -13,6 +13,18 @@ class MechanizeContent
     @best_title || fetch_titles
   end
   
+  def best_text
+    @best_text || fetch_texts
+  end
+  
+  def fetch_texts
+    (@pages || fetch_pages).each do |page|
+      text = fetch_text(page)
+      return @best_text = text unless text.nil?
+    end
+    return nil
+  end
+  
   def fetch_titles
     (@pages || fetch_pages).each do |page|
       title = page.title
@@ -61,4 +73,47 @@ class MechanizeContent
     agent.user_agent_alias = 'Mac Safari'
     return @agent = agent
   end
+  
+  def fetch_text(page)
+    doc = page.parser
+    readability = {}
+    doc.css('p').each do |paragraph|
+      if readability[paragraph.parent].nil?
+        readability[paragraph.parent] = 0
+      end
+      parent_class = paragraph.parent['class'] || ""
+      parent_id = paragraph.parent['id'] || ""
+      if !parent_class.match('(comment|meta|footer|footnote)').nil?
+        readability[paragraph.parent] -= 50
+      elsif !parent_class.match('((^|\\s)(post|hentry|entry[-]?(content|text|body)?|article[-_]?(content|text|body)?)(\\s|$))').nil?
+        readability[paragraph.parent] += 25
+      end
+    
+      if !parent_id.match('(comment|meta|footer|footnote)').nil?
+        readability[paragraph.parent] -= 50
+      elsif !parent_id.match('((^|\\s)(post|hentry|entry[-]?(content|text|body)?|article[-_]?(content|text|body)?)(\\s|$))').nil?
+        readability[paragraph.parent] += 25
+      end
+    
+      if paragraph.inner_text().length > 10
+        readability[paragraph.parent] += 1
+      end
+      readability[paragraph.parent] += paragraph.inner_text().count(',')
+    end
+    sorted_results = readability.sort_by { |parent,score| -score }
+    if sorted_results.nil? || sorted_results.first.nil?
+      return nil
+    else
+      top_result = sorted_results.first.first
+      top_result.css('script').unlink
+      top_result.css('iframe').unlink
+      top_result.css('h1').unlink
+      top_result.css('h2').unlink
+      text = top_result.text.delete("\t").delete("\n").strip
+      ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
+      text = ic.iconv(text + ' ')[0..-2]
+      return text
+    end
+  end
+  
 end

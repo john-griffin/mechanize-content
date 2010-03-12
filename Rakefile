@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "mechanize-content"
-    gem.summary = %Q{TODO: scrape the best content from a page}
-    gem.description = %Q{TODO: pass in a url or urls and mechanize-content will select the best block of text, image and title by analysing the page content}
+    gem.summary = %Q{scrape the best content from a page}
+    gem.description = %Q{pass in a url or urls and mechanize-content will select the best block of text, image and title by analysing the page content}
     gem.email = "johnog@gmail.com"
     gem.homepage = "http://github.com/john-griffin/mechanize-content"
     gem.authors = ["John Griffin"]
@@ -21,6 +21,7 @@ require 'spec/rake/spectask'
 Spec::Rake::SpecTask.new(:spec) do |spec|
   spec.libs << 'lib' << 'spec'
   spec.spec_files = FileList['spec/**/*_spec.rb']
+  spec.spec_opts = ["--debugger"]
 end
 
 Spec::Rake::SpecTask.new(:rcov) do |spec|
