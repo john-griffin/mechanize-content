@@ -11,6 +11,7 @@ begin
     gem.homepage = "http://github.com/john-griffin/mechanize-content"
     gem.authors = ["John Griffin"]
     gem.add_dependency('mechanize', '>= 1.0.0')
+    gem.add_dependency('imagesize', '>= 0.1.1')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
