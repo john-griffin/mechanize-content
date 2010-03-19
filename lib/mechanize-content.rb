@@ -37,7 +37,7 @@ class MechanizeContent
   def fetch_texts
     (@pages || fetch_pages).each do |page|
       text = fetch_text(page)
-      return @best_text = text unless text.nil?
+      return @best_text = text unless text.nil? || text.empty?
     end
     return nil
   end
@@ -125,6 +125,13 @@ class MechanizeContent
     
       if paragraph.inner_text().length > 10
         readability[paragraph.parent] += 1
+      end
+      if !paragraph.parent.attributes.values.nil?
+        if !paragraph.parent.attributes.values.first.nil?
+          if paragraph.parent.attributes.values.first.value.include? "comment"
+            break
+          end
+        end
       end
       readability[paragraph.parent] += paragraph.inner_text().count(',')
     end
