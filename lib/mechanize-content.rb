@@ -2,6 +2,7 @@ require 'rubygems'
 require 'mechanize'
 require 'image_size'
 require 'open-uri'
+require 'mechanize-content/util'
 
 class MechanizeContent
   
@@ -138,6 +139,8 @@ class MechanizeContent
     sorted_results = readability.sort_by { |parent,score| -score }
     if sorted_results.nil? || sorted_results.first.nil?
       return nil
+    elsif sorted_results.first.first.to_s.include? "site requires Flash"
+      return nil
     else
       top_result = sorted_results.first.first
       top_result.css('script').unlink
@@ -147,20 +150,11 @@ class MechanizeContent
       return top_result
     end
   end
-  
-  def get_base_url(doc, url)
-    base_url = doc.xpath("//base/@href").first
-    if base_url.nil?
-      return url
-    else
-      return base_url.value
-    end
-  end
-  
+    
   def fetch_image(page)
     top_content = fetch_content(page)
     if top_content
-      return find_best_image(top_content.css('img'), get_base_url(page.parser, page.uri))
+      return find_best_image(top_content.css('img'), Util.get_base_url(page.parser, page.uri))
     else
       return nil
     end
@@ -174,27 +168,19 @@ class MechanizeContent
     end
     return false
   end
-  
-  def build_absolute_url(current_src, url)
-    uri = URI.parse(current_src)
-    if uri.relative?
-      current_src = (URI.parse(url.to_s)+current_src).to_s
-    end
-    current_src
-  end
-  
+    
   def find_best_image(all_images, url)
     begin
       current_src = nil
       all_images.each do |img|
         current_src = img["src"]
         if valid_image?(img['width'].to_i, img['height'].to_i, current_src)
-          return build_absolute_url(current_src, url)
+          return Util.build_absolute_url(current_src, url)
         end
       end
       all_images.each do |img|
         current_src = img["src"]
-        current_src = build_absolute_url(current_src, url)
+        current_src = Util.build_absolute_url(current_src, url)
         open(current_src, "rb") do |fh|
           is = ImageSize.new(fh.read)
           if valid_image?(is.width, is.height, current_src)

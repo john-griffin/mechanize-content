@@ -96,11 +96,11 @@ describe "MechanizeContent" do
   it "build a base url for images" do
     mc = MechanizeContent.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
     page = mc.fetch_page("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    mc.get_base_url(page.parser, page.uri).to_s.should eql("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
+    MechanizeContent::Util.get_base_url(page.parser, page.uri).to_s.should eql("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
     
     mc = MechanizeContent.new("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
     page = mc.fetch_page("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
-    mc.get_base_url(page.parser, page.uri).to_s.should eql("http://www.mutinydesign.co.uk/")
+    MechanizeContent::Util.get_base_url(page.parser, page.uri).to_s.should eql("http://www.mutinydesign.co.uk/")
   end
   
   it "find image" do
@@ -158,6 +158,11 @@ describe "MechanizeContent" do
     mc.best_title.should eql("Destructoid - 'Nuff said: Good Old Games gets Another World")
     mc.best_text.should eql("Another World -- or Out of this World, as many of you will know it by -- is now on DRM-free digital distribution service Good Old Games. It can be had for $9.99. Need I say more?\rI love the game, even though I have never made it more than oh, five minutes in. It's more or less universally loved by the Destructoid staff. Not long after we got an email detailing the good news, the thread soon reached fifteen or so replies full of praise for the game.\rOther, less exciting recent releases include: Empire Earth II Gold, Gabriel Knight 3, and Aquanox. Not to completely s**t on these games, but this is Another World we're talking about here.")
     mc.best_image.should eql(nil)
+  end
+  
+  it "avoid using copy from flash sites" do
+    mc = MechanizeContent.new("http://www.godofwar.com/spartansstandtall/")
+    mc.best_text.should eql(nil)
   end
   
 end
