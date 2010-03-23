@@ -165,4 +165,9 @@ describe "MechanizeContent" do
     mc.best_text.should eql(nil)
   end
   
+  it "get this flash site to return nil for a title" do
+    mc = MechanizeContent.new("http://www.thewitcher.com/")
+    mc.best_text.should eql(nil)
+  end
+  
 end

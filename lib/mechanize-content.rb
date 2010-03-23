@@ -136,7 +136,7 @@ class MechanizeContent
     sorted_results = readability.sort_by { |parent,score| -score }
     if sorted_results.nil? || sorted_results.first.nil?
       return nil
-    elsif sorted_results.first.first.to_s.include? "site requires Flash"
+    elsif !sorted_results.first.first.xpath("//a[@href='http://get.adobe.com/flashplayer/']").empty?
       return nil
     else
       top_result = sorted_results.first.first
