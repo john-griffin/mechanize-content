@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{mechanize-content}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Griffin"]
-  s.date = %q{2010-03-19}
+  s.date = %q{2010-03-23}
   s.description = %q{pass in a url or urls and mechanize-content will select the best block of text, image and title by analysing the page content}
   s.email = %q{johnog@gmail.com}
   s.extra_rdoc_files = [
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/mechanize-content.rb",
+     "lib/mechanize-content/util.rb",
      "mechanize-content.gemspec",
      "spec/mechanize-content_spec.rb",
      "spec/spec.opts",
