@@ -75,22 +75,22 @@ describe "MechanizeContent" do
   
   it "reject all gifs" do
     mc = MechanizeContent.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    mc.valid_image?(500, 500, "http://www.cmpevents.com/GD10/ablank.gif2").should eql(false)
+    MechanizeContent::Util.valid_image?(500, 500, "http://www.cmpevents.com/GD10/ablank.gif2").should eql(false)
   end
   
   it "reject image with banner in the name" do
     mc = MechanizeContent.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    mc.valid_image?(500, 500, "http://www.cmpevents.com/GD10/banner.png").should eql(false)
+    MechanizeContent::Util.valid_image?(500, 500, "http://www.cmpevents.com/GD10/banner.png").should eql(false)
   end
   
   it "reject image that is too small" do
     mc = MechanizeContent.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    mc.valid_image?(64, 500, "http://www.cmpevents.com/GD10/toosmall.png").should eql(false)
+    MechanizeContent::Util.valid_image?(64, 500, "http://www.cmpevents.com/GD10/toosmall.png").should eql(false)
   end
   
   it "allow good images" do
     mc = MechanizeContent.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    mc.valid_image?(500, 500, "http://www.cmpevents.com/GD10/perfecto.png").should eql(true)
+    MechanizeContent::Util.valid_image?(500, 500, "http://www.cmpevents.com/GD10/perfecto.png").should eql(true)
   end
   
   it "build a base url for images" do

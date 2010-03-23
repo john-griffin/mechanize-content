@@ -7,10 +7,7 @@ require 'mechanize-content/util'
 class MechanizeContent
   
   attr_accessor :urls
-  
-  MIN_WIDTH  = 64
-  MIN_HEIGHT = 64
-  
+    
   def initialize(*args)
     @urls = *args
   end
@@ -159,22 +156,13 @@ class MechanizeContent
       return nil
     end
   end  
-  
-  def valid_image?(width, height, src)
-    if width > MIN_WIDTH && height > MIN_HEIGHT && !src.include?("banner") && !src.include?(".gif")
-      if (!(width == 728) && !(height == 90))
-        return true
-      end
-    end
-    return false
-  end
-    
+      
   def find_best_image(all_images, url)
     begin
       current_src = nil
       all_images.each do |img|
         current_src = img["src"]
-        if valid_image?(img['width'].to_i, img['height'].to_i, current_src)
+        if Util.valid_image?(img['width'].to_i, img['height'].to_i, current_src)
           return Util.build_absolute_url(current_src, url)
         end
       end
@@ -183,7 +171,7 @@ class MechanizeContent
         current_src = Util.build_absolute_url(current_src, url)
         open(current_src, "rb") do |fh|
           is = ImageSize.new(fh.read)
-          if valid_image?(is.width, is.height, current_src)
+          if Util.valid_image?(is.width, is.height, current_src)
             return current_src
           end
         end
