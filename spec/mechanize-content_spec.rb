@@ -2,6 +2,35 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "MechanizeContent" do
+  
+  def register(url, fixture)
+    FakeWeb.register_uri(:any, url, :response => File.join(File.dirname(__FILE__), 'fixtures', fixture))
+  end
+  
+  def register_image(url, fixture)
+    FakeWeb.register_uri(:any, url, :body => File.join(File.dirname(__FILE__), 'fixtures', fixture))
+  end
+  
+  before(:all) do
+    register("http://techmeme.com/",'techmeme.html')
+    register("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition",'another_world_15th_anniversary_edition.html')
+    register("http://www.destructoid.com/-nuff-said-good-old-games-gets-another-world-168150.phtml",'nuff-said-good-old-games-gets-another-world-168150.html')
+    register("http://www.rockstargames.com/newswire/2010/03/18/4061/episodes_from_liberty_city_now_coming_to_playstation_3_and_pc_this_april",'episodes_from_liberty_city_now_coming_to_playstation_3_and_pc_this_april.html')
+    register("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601",'cmp.html')
+    register("http://www.gamesetwatch.com/2010/03/gdc_2010_rounds_off_indie_cove.php",'gdc_2010_rounds_off_indie_cove.html')
+    register("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/",'mutiny.html')
+    register("http://www.joystiq.com/2010/03/18/xbox-360-gaining-usb-storage-support-in-2010-update/",'xbox-360-gaining-usb-storage-support-in-2010-update.html')
+    register("http://www.vg247.com/2010/03/18/gta-iv-episodes-from-liberty-city-sees-slight-delay-on-pc-and-ps3/",'gta-iv-episodes-from-liberty-city-sees-slight-delay-on-pc-and-ps3.html')
+    register("http://www.facebook.com/RockBand",'rockband_facebook.html')
+    register("http://www.vg247.com/2010/03/09/rock-band-3-out-this-holiday-will-revolutionize-genre/",'rock-band-3-out-this-holiday-will-revolutionize-genre.html')
+    register("http://www.joystiq.com/2010/03/18/another-world-15th-anniversary-edition-now-on-gog-com/",'another-world-15th-anniversary-edition-now-on-gog-com.html')
+    register("http://www.godofwar.com/spartansstandtall/",'spartan.html')
+    register("http://www.thewitcher.com/",'witcher.html')
+    
+    register_image("http://www.rockstargames.com/rockstar/local_data/US/img/news/eflc_luisjohnny.jpg",'johnny.jpg')
+    register_image("http://www.blogcdn.com/www.joystiq.com/media/2010/03/joystiq-xbox-usb-support-580.jpg",'joystiq-xbox-usb-support-580.jpg')
+  end
+  
   it "initialise mechanize content" do
     mc = MechanizeContent.new("http://www.google.com")
     mc.urls.first.should eql("http://www.google.com")
@@ -156,14 +185,9 @@ describe "MechanizeContent" do
   
   it "getting wrong blurb from detructoid" do
     mc = MechanizeContent.new("http://www.destructoid.com/-nuff-said-good-old-games-gets-another-world-168150.phtml")
-    mc.best_title.should eql("Destructoid - 'Nuff said: Good Old Games gets Another World")
+    mc.best_title.should eql("'Nuff said: Good Old Games gets Another World- Destructoid")
     mc.best_text.should eql("Another World -- or Out of this World, as many of you will know it by -- is now on DRM-free digital distribution service Good Old Games. It can be had for $9.99. Need I say more?\rI love the game, even though I have never made it more than oh, five minutes in. It's more or less universally loved by the Destructoid staff. Not long after we got an email detailing the good news, the thread soon reached fifteen or so replies full of praise for the game.\rOther, less exciting recent releases include: Empire Earth II Gold, Gabriel Knight 3, and Aquanox. Not to completely s**t on these games, but this is Another World we're talking about here.")
     mc.best_image.should eql(nil)
-  end
-  
-  it "avoid using copy from flash sites" do
-    mc = MechanizeContent.new("http://www.godofwar.com/spartansstandtall/")
-    mc.best_text.should eql(nil)
   end
   
   it "get this flash site to return nil for a title" do
