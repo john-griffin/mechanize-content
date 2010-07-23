@@ -13,21 +13,21 @@ class MechanizeContent
   end
   
   def best_title
-    @best_title || fetch_titles
+    @best_title ||= fetch_titles
   end
   
   def best_text
-    @best_text || fetch_texts
+    @best_text ||= fetch_texts
   end
   
   def best_image
-    @best_image || fetch_images
+    @best_image ||= fetch_images
   end
   
   def fetch_images
     (@pages || fetch_pages).each do |page|
       image = fetch_image(page)
-      return @best_image = image unless image.nil?
+      return image unless image.nil?
     end
     return nil
   end
@@ -35,7 +35,7 @@ class MechanizeContent
   def fetch_texts
     (@pages || fetch_pages).each do |page|
       text = fetch_text(page)
-      return @best_text = text unless text.nil? || text.empty?
+      return text unless text.nil? || text.empty?
     end
     return nil
   end
@@ -46,7 +46,7 @@ class MechanizeContent
       unless title.nil?
         ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
         title = ic.iconv(title + ' ')[0..-2]
-        return @best_title = title
+        return title
       end
       
     end
