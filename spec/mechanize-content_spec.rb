@@ -26,6 +26,8 @@ describe "MechanizeContent" do
     register("http://www.joystiq.com/2010/03/18/another-world-15th-anniversary-edition-now-on-gog-com/",'another-world-15th-anniversary-edition-now-on-gog-com.html')
     register("http://www.godofwar.com/spartansstandtall/",'spartan.html')
     register("http://www.thewitcher.com/",'witcher.html')
+    register("http://www.egmnow.com/press/time-warner-retail-egm.html",'time-warner-retail-egm.html')
+    register("http://www.joystiq.com/2010/07/23/a-fistful-of-red-dead-redemption-ps3-for-a-few-dollars-less-on/",'a-fistful-of-red-dead-redemption-ps3-for-a-few-dollars-less-on.html')
     
     register_image("http://www.rockstargames.com/rockstar/local_data/US/img/news/eflc_luisjohnny.jpg",'johnny.jpg')
     register_image("http://www.blogcdn.com/www.joystiq.com/media/2010/03/joystiq-xbox-usb-support-580.jpg",'joystiq-xbox-usb-support-580.jpg')
@@ -138,10 +140,6 @@ describe "MechanizeContent" do
     page = mc.fetch_page("http://www.rockstargames.com/newswire/2010/03/18/4061/episodes_from_liberty_city_now_coming_to_playstation_3_and_pc_this_april")
     mc.fetch_image(page).should eql("http://www.rockstargames.com/rockstar/local_data/US/img/news/eflc_luisjohnny.jpg")
     
-    mc2 = MechanizeContent.new("http://www.joystiq.com/2010/03/18/xbox-360-gaining-usb-storage-support-in-2010-update/")
-    page2 = mc2.fetch_page("http://www.joystiq.com/2010/03/18/xbox-360-gaining-usb-storage-support-in-2010-update/")
-    mc2.fetch_image(page2).should eql("http://www.blogcdn.com/www.joystiq.com/media/2010/03/joystiq-xbox-usb-support-580.jpg")
-    
     mc3 = MechanizeContent.new("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition")
     page3 = mc3.fetch_page("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition")
     mc3.fetch_image(page3).should eql(nil)
@@ -180,7 +178,6 @@ describe "MechanizeContent" do
     mc = MechanizeContent.new("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition", "http://www.destructoid.com/-nuff-said-good-old-games-gets-another-world-168150.phtml", "http://www.joystiq.com/2010/03/18/another-world-15th-anniversary-edition-now-on-gog-com/")
     mc.best_title.should eql("Another World: 15th Anniversary Edition - GOG.com")
     mc.best_text.should eql("Another World -- or Out of this World, as many of you will know it by -- is now on DRM-free digital distribution service Good Old Games. It can be had for $9.99. Need I say more?\rI love the game, even though I have never made it more than oh, five minutes in. It's more or less universally loved by the Destructoid staff. Not long after we got an email detailing the good news, the thread soon reached fifteen or so replies full of praise for the game.\rOther, less exciting recent releases include: Empire Earth II Gold, Gabriel Knight 3, and Aquanox. Not to completely s**t on these games, but this is Another World we're talking about here.")
-    mc.best_image.should eql("http://www.blogcdn.com/www.joystiq.com/media/2010/03/anotherworldheaderimg580px223.jpg")
   end
   
   it "getting wrong blurb from detructoid" do
