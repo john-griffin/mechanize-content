@@ -6,7 +6,7 @@ Returns the most important pieces of content on a web page. Finds the best block
 
 Pass in a URL on initialisation and then call the helpers to pull the best content out.
 
-<tt>mc = MechanizeContent.new("http://www.joystiq.com/2010/03/19/mag-gets-free-trooper-gear-pack-dlc-next-week/")</tt>
+<tt>mc = MechanizeContent::Parser.new("http://www.joystiq.com/2010/03/19/mag-gets-free-trooper-gear-pack-dlc-next-week/")</tt>
 
 <tt>mc.best_title</tt>
 
@@ -28,7 +28,7 @@ The gem also supports multiple URLs and will find the best content between them.
 * imagesize
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
