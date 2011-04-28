@@ -10,7 +10,7 @@ module MechanizeContent
     attr_accessor :urls
 
     def initialize(*args)
-      @urls = *args
+      @urls = *args.flatten
     end
 
     def best_title
