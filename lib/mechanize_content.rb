@@ -4,6 +4,7 @@ require 'image_size'
 require 'open-uri'
 require 'mechanize_content/util'
 require 'mechanize_content/page'
+require 'mechanize_content/image'
 
 module MechanizeContent
   class Parser

@@ -11,63 +11,27 @@ module MechanizeContent
     end
     
     def text
-      text = fetch_text
-      return text unless text.nil? || text.empty?
+      Util.force_utf8(best_content.text) if best_content
     end
     
     def image
-      image = fetch_image
-      return image unless image.nil?
+      @image ||= best_content ? Image.new(images, base_url).url : nil
     end
     
-    def fetch_text
-      top_content = parse_content
-      if top_content
-        text = top_content.text.delete("\t").delete("\n").strip
-        ic = Iconv.new('UTF-8//IGNORE', 'UTF-8')
-        text = ic.iconv(text + ' ')[0..-2]
-      else
-        return nil
-      end
+    def images
+      best_content.css('img')
     end
     
-    def fetch_image
-      top_content = parse_content
-      if top_content
-        return find_best_image(top_content.css('img'), Util.get_base_url(content.parser, content.uri))
-      else
-        return nil
-      end
+    def base_url
+      base = content.parser.xpath("//base/@href").first
+      base ? base.value : content.uri
+    end
+        
+    def best_content
+      @best_content ||= find_content
     end
     
-    def find_best_image(all_images, url)
-      begin
-        current_src = nil
-        all_images.each do |img|
-          current_src = img["src"]
-          if Util.valid_image?(img['width'].to_i, img['height'].to_i, current_src)
-            return Util.build_absolute_url(current_src, url)
-          end
-        end
-        all_images.each do |img|
-          current_src = img["src"]
-          current_src = Util.build_absolute_url(current_src, url)
-          open(current_src, "rb") do |fh|
-            is = ImageSize.new(fh.read)
-            if Util.valid_image?(is.width, is.height, current_src)
-              return current_src
-            end
-          end
-        end
-        return nil
-      rescue Errno::ENOENT
-        puts "No such file - " + current_src
-      rescue 
-        puts "There was a problem connecting - " + current_src
-      end
-    end
-    
-    def parse_content
+    def find_content
       return nil unless content
       doc = content.parser
       readability = {}
