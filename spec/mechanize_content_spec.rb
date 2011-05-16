@@ -6,7 +6,7 @@ describe "MechanizeContent" do
   
   it "initialise mechanize content" do
     mc = MechanizeContent::Parser.new("http://www.google.com")
-    mc.urls.first.should eql("http://www.google.com")
+    mc.pages.first.url.should eql("http://www.google.com")
   end
   
   it "fetch the best title" do
@@ -15,53 +15,48 @@ describe "MechanizeContent" do
   end
   
   it "page has incorrect class so only url returned" do
+    p = MechanizeContent::Page.new("http://techmeme.com/")
+    p.stub!(:agent => double("agent", :get => double("p")))
+    MechanizeContent::Page.stub!(:new => p)
     mc = MechanizeContent::Parser.new("http://techmeme.com/")
-    agent = mock("agent")
-    page = mock("page")
-    page.stub!(:class).and_return(String)
-    agent.should_receive(:get).with("http://techmeme.com/").and_return(page)
-    mc.should_receive(:init_agent).and_return(agent)
     mc.best_title.should eql("http://techmeme.com/")
   end
   
   it "page has no title so only url returned" do
+    p = mock("page", :title => nil, :url => "http://techmeme.com/")
+    MechanizeContent::Page.stub!(:new => p)
     mc = MechanizeContent::Parser.new("http://techmeme.com/")
-    agent = mock("agent")
-    page = mock("page")
-    page.stub!(:class).and_return(Mechanize::Page)
-    page.stub!(:title).and_return(nil)
-    agent.should_receive(:get).with("http://techmeme.com/").and_return(page)
-    mc.should_receive(:init_agent).and_return(agent)
     mc.best_title.should eql("http://techmeme.com/")
   end
   
   it "page retrival errors" do
-    mc = MechanizeContent::Parser.new("http://techmeme.com/")
+    mc = MechanizeContent::Page.new("http://techmeme.com/")
+    mc2 = MechanizeContent::Page.new("http://somewherelse.com/")
     agent = mock("agent")
     page = mock("page")
     page.stub!(:class).and_return(Mechanize::Page)
     agent.should_receive(:get).with("http://techmeme.com/").and_raise(Timeout::Error)
     agent.should_receive(:get).with("http://somewherelse.com/").and_raise(Errno::ECONNRESET)
-    mc.should_receive(:init_agent).any_number_of_times.and_return(agent)
+    mc.should_receive(:agent).any_number_of_times.and_return(agent)
+    mc2.should_receive(:agent).any_number_of_times.and_return(agent)
     
-    mc.fetch_page("http://techmeme.com/").should eql(nil)
-    mc.fetch_page("http://somewherelse.com/").should eql(nil)
+    mc.fetch_content.should eql(nil)
+    mc2.fetch_content.should eql(nil)
   end  
   
   it "mechanize page issues" do
-    mc = MechanizeContent::Parser.new("http://techmeme.com/")
+    mc = MechanizeContent::Page.new("http://techmeme.com/")
     agent = mock("agent")
     page = mock("page")
-    mc.stub!(:init_agent).and_return(agent)
+    mc.stub!(:agent).and_return(agent)
     page.stub!(:code).and_return(400)
     agent.should_receive(:get).with("http://techmeme.com/").and_return(page)
-    mc.fetch_page("http://techmeme.com/").should eql(nil)
+    mc.fetch_content.should eql(nil)
   end
   
   it "fetch some text" do
-    mc2 = MechanizeContent::Parser.new("http://www.gamesetwatch.com/2010/03/gdc_2010_rounds_off_indie_cove.php")
-    page = mc2.fetch_page("http://www.gamesetwatch.com/2010/03/gdc_2010_rounds_off_indie_cove.php")
-    mc2.fetch_text(page).should eql("Game Developers Conference organizers have confirmed the final set of independent game-specific content, including Ron Carmel on the just-debuted Indie Fund, the Gamma IV party/showcase, and the EGW-replacing Nuovo Sessions game showcase.The newly confirmed details round off a multitude of independent game-specific content at the March 9th-13th event, held at the Moscone Center in San Francisco, including the 12th Annual Independent Games Festival -- featuring over 30 top indie games playable on the GDC Expo floor from Thursday 11th to Saturday 13th, as well as the major IGF Awards on Thursday 11th at 6.30pm.In addition, the 4th Independent Games Summit on Tuesday 9th and Wednesday 10th has added and clarified a number of sessions, with 2D Boy's Ron Carmel kicking off the event with 'Indies and Publishers: Fixing a System That Never Worked', now confirmed to discuss the new Indie Fund organization.Another major new panel, 'Tripping The Art Fantastic', features Spelunky creator Derek Yu, Braid artist David Hellman and Super Meat Boy co-creator Edmund McMillen discussing \"how each one of these figures influences the state of game art, from hand painted epics to short form experimental Flash games.\"")
+    mc2 = MechanizeContent::Page.new("http://www.gamesetwatch.com/2010/03/gdc_2010_rounds_off_indie_cove.php")
+    mc2.fetch_text.should eql("Game Developers Conference organizers have confirmed the final set of independent game-specific content, including Ron Carmel on the just-debuted Indie Fund, the Gamma IV party/showcase, and the EGW-replacing Nuovo Sessions game showcase.The newly confirmed details round off a multitude of independent game-specific content at the March 9th-13th event, held at the Moscone Center in San Francisco, including the 12th Annual Independent Games Festival -- featuring over 30 top indie games playable on the GDC Expo floor from Thursday 11th to Saturday 13th, as well as the major IGF Awards on Thursday 11th at 6.30pm.In addition, the 4th Independent Games Summit on Tuesday 9th and Wednesday 10th has added and clarified a number of sessions, with 2D Boy's Ron Carmel kicking off the event with 'Indies and Publishers: Fixing a System That Never Worked', now confirmed to discuss the new Indie Fund organization.Another major new panel, 'Tripping The Art Fantastic', features Spelunky creator Derek Yu, Braid artist David Hellman and Super Meat Boy co-creator Edmund McMillen discussing \"how each one of these figures influences the state of game art, from hand painted epics to short form experimental Flash games.\"")
   end
   
   it "find the best text" do
@@ -93,28 +88,24 @@ describe "MechanizeContent" do
   end
   
   it "build a base url for images" do
-    mc = MechanizeContent::Parser.new("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
-    page = mc.fetch_page("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
+    mc = MechanizeContent::Page.new("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
+    page = mc.fetch_content
     MechanizeContent::Util.get_base_url(page.parser, page.uri).to_s.should eql("http://www.mutinydesign.co.uk")
   end
   
   it "find image" do
-    mc = MechanizeContent::Parser.new("http://www.rockstargames.com/newswire/article/16021/street-crimes-of-la-noire-new-screenshots-info.html")
-    page = mc.fetch_page("http://www.rockstargames.com/newswire/article/16021/street-crimes-of-la-noire-new-screenshots-info.html")
-    mc.fetch_image(page).should eql("http://media.rockstargames.com/rockstargames/img/global/news/upload/lanoire_streetcrimes_cameraobscura.jpg")
+    mc = MechanizeContent::Page.new("http://www.rockstargames.com/newswire/article/16021/street-crimes-of-la-noire-new-screenshots-info.html")
+    mc.fetch_image.should eql("http://media.rockstargames.com/rockstargames/img/global/news/upload/lanoire_streetcrimes_cameraobscura.jpg")
     
-    mc3 = MechanizeContent::Parser.new("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition")
-    page3 = mc3.fetch_page("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition")
-    mc3.fetch_image(page3).should eql(nil)
+    mc3 = MechanizeContent::Page.new("http://www.gog.com/en/gamecard/another_world_15th_anniversary_edition")
+    mc3.fetch_image.should eql(nil)
     
-    mc4 = MechanizeContent::Parser.new("http://www.gog.com/page_has_no_content")
-    page4 = mock("page")
-    mc4.stub!(:fetch_content).with(page4).and_return(nil)
-    mc4.fetch_image(page4).should eql(nil)
+    mc4 = MechanizeContent::Page.new("http://www.gog.com/page_has_no_content")
+    mc4.stub!(:fetch_content).and_return(nil)
+    mc4.fetch_image.should eql(nil)
     
-    mc5 = MechanizeContent::Parser.new("http://www.egmnow.com/press/time-warner-retail-egm.html")
-    page5 = mc5.fetch_page("http://www.egmnow.com/press/time-warner-retail-egm.html")
-    mc5.fetch_image(page5).should eql("http://www.egmnow.com/images/egmlogo.jpg")
+    mc5 = MechanizeContent::Page.new("http://www.egmnow.com/press/time-warner-retail-egm.html")
+    mc5.fetch_image.should eql("http://www.egmnow.com/images/egmlogo.jpg")
   end
   
   it "find the best image" do
