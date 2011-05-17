@@ -68,23 +68,27 @@ describe "MechanizeContent" do
   end
   
   it "reject all gifs" do
-    mc = MechanizeContent::Parser.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    MechanizeContent::Util.valid_image?(500, 500, "http://www.cmpevents.com/GD10/ablank.gif2").should eql(false)
+    img = {"src" => "http://www.cmpevents.com/GD10/ablank.gif2", "width" => 500, "height" => 500}
+    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
+    image.should_not be_interesting_css    
   end
   
   it "reject image with banner in the name" do
-    mc = MechanizeContent::Parser.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    MechanizeContent::Util.valid_image?(500, 500, "http://www.cmpevents.com/GD10/banner.png").should eql(false)
+    img = {"src" => "http://www.cmpevents.com/GD10/banner.png", "width" => 500, "height" => 500}
+    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
+    image.should_not be_interesting_css    
   end
   
   it "reject image that is too small" do
-    mc = MechanizeContent::Parser.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    MechanizeContent::Util.valid_image?(64, 500, "http://www.cmpevents.com/GD10/toosmall.png").should eql(false)
+    img = {"src" => "http://www.cmpevents.com/GD10/toosmall.png", "width" => 64, "height" => 500}
+    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
+    image.should_not be_interesting_css
   end
   
   it "allow good images" do
-    mc = MechanizeContent::Parser.new("https://www.cmpevents.com/GD10/a.asp?option=C&V=11&SessID=10601")
-    MechanizeContent::Util.valid_image?(500, 500, "http://www.cmpevents.com/GD10/perfecto.png").should eql(true)
+    img = {"src" => "http://www.cmpevents.com/GD10/perfecto.png", "width" => 500, "height" => 500}
+    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
+    image.should be_interesting_css
   end
   
   it "build a base url for images" do

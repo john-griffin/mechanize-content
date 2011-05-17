@@ -15,7 +15,7 @@ module MechanizeContent
     end
     
     def image
-      @image ||= best_content ? Image.new(images, base_url).url : nil
+      @image ||= best_content ? Image.best_image(images, base_url) : nil
     end
     
     def images

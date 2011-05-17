@@ -1,39 +1,52 @@
 module MechanizeContent
   class Image
-    def initialize(images, base_url)
-      @images, @base_url = images, base_url
+    MIN_WIDTH  = 64
+    MIN_HEIGHT = 64
+    AD_WIDTH = 728
+    AD_HEIGHT = 90
+    
+    def self.best_image(images, base_url)
+      imgs = images.map{|i| Image.new(i, base_url)}
+      top_image = imgs.select{|i| i.interesting_css?}.first || imgs.select{|i| i.interesting_file?}.first
+      top_image.absolute_url if top_image
     end
     
-    def url
-      @url ||= find_best_image
+    def initialize(image, base_url)
+      @src      = image["src"]
+      @width    = image["width"].to_i
+      @height   = image["height"].to_i
+      @base_url = base_url
     end
     
-    def find_best_image
-      begin
-        current_src = nil
-        @images.each do |img|
-          current_src = img["src"]
-          if Util.valid_image?(img['width'].to_i, img['height'].to_i, current_src)
-            return Util.build_absolute_url(current_src, @base_url)
-          end
-        end
-        @images.each do |img|
-          current_src = img["src"]
-          current_src = Util.build_absolute_url(current_src, @base_url)
-          open(current_src, "rb") do |fh|
-            is = ImageSize.new(fh.read)
-            if Util.valid_image?(is.width, is.height, current_src)
-              return current_src
-            end
-          end
-        end
-        return nil
-      rescue Errno::ENOENT
-        puts "No such file - " + current_src
-      # rescue 
-      #   puts "There was a problem connecting - " + current_src
+    def interesting_css?
+      valid_image?(@width, @height)
+    end
+    
+    def interesting_file?
+      open(absolute_url, "rb") do |fh|
+        is = ImageSize.new(fh.read)
+        return valid_image?(is.width, is.height)
       end
     end
     
+    def valid_image?(width, height)
+      big_enough?(width, height) && not_advertising?(width, height)
+    end
+    
+    def advertising?(width, height)
+      @src.include?("banner") || @src.include?(".gif") || ((width == AD_WIDTH) && (height == AD_HEIGHT))
+    end
+    
+    def not_advertising?(width, height)
+      !advertising?(width, height)
+    end
+    
+    def big_enough?(width, height)
+      width > MIN_WIDTH && height > MIN_HEIGHT
+    end
+    
+    def absolute_url
+      URI.parse(@src).relative? ? (URI.parse(@base_url.to_s)+@src).to_s : @src
+    end    
   end
 end
