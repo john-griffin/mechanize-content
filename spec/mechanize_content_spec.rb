@@ -66,31 +66,7 @@ describe "MechanizeContent" do
     mc2 = MechanizeContent::Parser.new("http://www.gamesetwatch.com/2010/03/gdc_2010_rounds_off_indie_cove.php")
     mc2.best_text.should eql("Game Developers Conference organizers have confirmed the final set of independent game-specific content, including Ron Carmel on the just-debuted Indie Fund, the Gamma IV party/showcase, and the EGW-replacing Nuovo Sessions game showcase.The newly confirmed details round off a multitude of independent game-specific content at the March 9th-13th event, held at the Moscone Center in San Francisco, including the 12th Annual Independent Games Festival -- featuring over 30 top indie games playable on the GDC Expo floor from Thursday 11th to Saturday 13th, as well as the major IGF Awards on Thursday 11th at 6.30pm.In addition, the 4th Independent Games Summit on Tuesday 9th and Wednesday 10th has added and clarified a number of sessions, with 2D Boy's Ron Carmel kicking off the event with 'Indies and Publishers: Fixing a System That Never Worked', now confirmed to discuss the new Indie Fund organization.Another major new panel, 'Tripping The Art Fantastic', features Spelunky creator Derek Yu, Braid artist David Hellman and Super Meat Boy co-creator Edmund McMillen discussing \"how each one of these figures influences the state of game art, from hand painted epics to short form experimental Flash games.\"")
   end
-  
-  it "reject all gifs" do
-    img = {"src" => "http://www.cmpevents.com/GD10/ablank.gif2", "width" => 500, "height" => 500}
-    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
-    image.should_not be_interesting_css    
-  end
-  
-  it "reject image with banner in the name" do
-    img = {"src" => "http://www.cmpevents.com/GD10/banner.png", "width" => 500, "height" => 500}
-    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
-    image.should_not be_interesting_css    
-  end
-  
-  it "reject image that is too small" do
-    img = {"src" => "http://www.cmpevents.com/GD10/toosmall.png", "width" => 64, "height" => 500}
-    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
-    image.should_not be_interesting_css
-  end
-  
-  it "allow good images" do
-    img = {"src" => "http://www.cmpevents.com/GD10/perfecto.png", "width" => 500, "height" => 500}
-    image = MechanizeContent::Image.new(img, "https://www.cmpevents.com")
-    image.should be_interesting_css
-  end
-  
+    
   it "build a base url for images" do
     mc = MechanizeContent::Page.new("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
     mc.base_url.to_s.should eql("http://www.mutinydesign.co.uk")
