@@ -89,8 +89,7 @@ describe "MechanizeContent" do
   
   it "build a base url for images" do
     mc = MechanizeContent::Page.new("http://www.mutinydesign.co.uk/scripts/html-base-tag---1/")
-    page = mc.fetch_content
-    MechanizeContent::Util.get_base_url(page.parser, page.uri).to_s.should eql("http://www.mutinydesign.co.uk")
+    mc.base_url.to_s.should eql("http://www.mutinydesign.co.uk")
   end
   
   it "find image" do
