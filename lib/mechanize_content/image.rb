@@ -30,7 +30,16 @@ module MechanizeContent
     end
     
     def valid_image?(width, height)
-      big_enough?(width, height) && not_advertising?(width, height)
+      big_enough?(width, height) && not_advertising?(width, height) && allows_hotlinking?
+    end
+    
+    def allows_hotlinking?
+      begin
+        open(absolute_url, "Referer" => "http://splitstate.com")
+      rescue OpenURI::HTTPError, SocketError
+        return false
+      end
+      true
     end
     
     def advertising?(width, height)

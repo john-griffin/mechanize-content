@@ -114,6 +114,17 @@ describe "MechanizeContent" do
         mc.best_image.should eql("http://assets.vg247.com/current//2010/03/rockbandlogo.jpg")
       end
     end
+    
+    context "given the first pick does not support hot linking" do
+      it "will fall back to the next image" do
+        mc = MechanizeContent::Parser.new("http://www.andriasang.com/e/blog/2011/05/27/kojima_questions/",
+                                          "http://www.joystiq.com/2011/05/27/kojima-something-big-planned-for-25th-metal-gear-anniversary-ne/",
+                                          "http://www.giantbomb.com/news/hideo-kojima-smacks-down-rumors-spreads-disappointment-ahead-of-e3/3272/",
+                                          "http://www.vg247.com/2011/05/27/kojima-no-mgs5-at-e3-ngp-project-isnt-mgs4-port/",
+                                          "http://www.1up.com/news/kojima-planning-something-big-metal-gear-anniversary")
+        mc.best_image.should == "http://media.giantbomb.com/uploads/0/91/233021-2368273836_4080f1e08e_o_middle.jpg"
+      end
+    end
   end
   
   describe ".initialize" do
