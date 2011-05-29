@@ -11,7 +11,7 @@ module MechanizeContent
     end
     
     def text
-      Util.force_utf8(best_content.text) if best_content
+      Util.force_utf8(best_content.text) if best_content && best_content.text.size > 50
     end
     
     def image
@@ -76,6 +76,9 @@ module MechanizeContent
         top_result.css('iframe').unlink
         top_result.css('h1').unlink
         top_result.css('h2').unlink
+        top_result.css("div#date-byline").unlink
+        top_result.css("p.date").unlink
+        top_result.css("div#facebook-like-button").unlink
         return top_result
       end
     end

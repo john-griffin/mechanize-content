@@ -82,6 +82,15 @@ describe "MechanizeContent" do
         mc.best_text.should eql(nil)
       end
     end
+    
+    context "given a first page with text that is too short" do
+      it "will pull text from the next suitable page" do
+        mc = MechanizeContent::Parser.new("http://www.examiner.com/fps-in-national/playstation-network-up-japan-video-announcement-video",
+                                          "http://www.vg247.com/2011/05/28/sony-brings-psn-back-online-in-japan/",
+                                          "http://kotaku.com/5806527/oh-yeah--playstation-network-is-back-online-in-japan")
+        mc.best_text.should eq("Sony has announced that it has brought PlayStation Network services back online in Japan.After announcing a phased restoration of PSN and Qriocity Services in Japan and Asian countries and regions including Taiwan, Singapore, Malaysia, Indonesia, and Thailand yesterday, the firm has released a video of Sony president Kaz Harai revealing the service being brought back online.It’s posted below. But he is speaking in Japanese and there are no subtitles – just so you know. Yesterday, Sony also announced its plans for increased security measures in the region, which will “strengthen [and] safeguard against unauthorized activity, and provide consumers with greater protection of their personal information.”As an additional measure, a Chief Information Security Officer was created at SNEI who will work to reinforce overall information security across the company’s network infrastructure.“I’d also like to send my sincere regret to customers in Japan and Asian countries and regions for the inconvenience these events have caused you,” said Hirai. “We are taking aggressive action including increasing security measures and working with respective authorities to address the concerns that were raised by this incident.“We are making consumer data protection a full-time, company wide commitment so that our customers can rest assured about enjoying their entertainment.”The first phase of restored services for these countries and regions will include:Sign-in for PlayStationNetwork and Qriocity services, including the resetting of passwordsRestoration of online game-play across PS3 and PSP‘Friends’ category on PS3, including Friends List, Chat Functionality, Trophy Comparison, etc.PlayStation HomeAccess to other network features on services such as torne.(Customers will not be able to download movies rented through PlayStation Network video download service because movies have expired as a result of PlayStation Network service being turned off since April 21 (JST).)Thanks, Examiner.    Related postsPlayStation Japan relief effort brings in $1.3 millionSeason One tester brings Tribbles to Star Trek OnlineSony Japan reveals Dress                                                                                                        2                                                        Posted in: Japan, PSN, Sony                Tags: kaz hirai, psn services")
+      end
+    end
   end
   
   describe "#best_image" do
