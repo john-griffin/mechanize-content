@@ -114,6 +114,14 @@ describe "MechanizeContent" do
         mc.best_image.should eql("http://assets.vg247.com/current//2010/03/rockbandlogo.jpg")
       end
     end
+
+    context "given a url with strange utf8 encoding" do
+      it "will find the best image" do
+        mc = MechanizeContent::Parser.new(%w(http://www.computerandvideogames.com/310643/news/lg-dedicated-gaming-handhelds-are-over/ 
+                                                   http://www.destructoid.com/lg-age-of-dedicated-gaming-handhelds-is-over--205485.phtml))
+        mc.best_image.should eql("http://cdn.medialib.computerandvideogames.com/screens/screenshot_259495_thumb_wide300.jpg")
+      end
+    end
     
     context "given the first pick does not support hot linking" do
       it "will fall back to the next image" do
