@@ -1,3 +1,5 @@
+require "iconv"
+
 module MechanizeContent
   class Util          
     def self.force_utf8(string)
